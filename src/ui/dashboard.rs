@@ -275,10 +275,9 @@ fn draw_hosts(f: &mut Frame, area: Rect, app: &mut App) {
     header.push("Problems");
     widths.push(Constraint::Length(12));
 
-    let table = Table::new(rows, widths)
+    let table = Table::new(mark_selected(rows, app.hosts_state.selected(), t), widths)
         .header(Row::new(header).style(Style::new().fg(t.muted)))
         .column_spacing(2)
-        .row_highlight_style(Style::new().bg(t.surface))
         .block(panel("Hosts", t));
     let mut state = app.hosts_state;
     f.render_stateful_widget(table, area, &mut state);

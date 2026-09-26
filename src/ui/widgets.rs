@@ -9,7 +9,7 @@ use ratatui::layout::{Alignment, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::symbols::Marker;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Axis, Block, BorderType, Chart, Dataset, GraphType, LegendPosition, Paragraph};
+use ratatui::widgets::{Axis, Block, BorderType, Chart, Dataset, GraphType, LegendPosition, Paragraph, Row};
 
 pub fn panel<'a>(title: impl Into<String>, t: &Theme) -> Block<'a> {
     Block::bordered().border_type(BorderType::Rounded).border_style(Style::new().fg(t.border)).title(Line::from(vec![
@@ -211,6 +211,13 @@ fn nice_ceil(v: f64) -> f64 {
     let n = v / mag;
     let step = [1.0, 2.0, 2.5, 5.0, 10.0].into_iter().find(|s| n <= *s).unwrap_or(10.0);
     step * mag
+}
+
+/// Highlight the selected row through its base style rather than
+/// `row_highlight_style`, which is painted over the cells and would wipe out
+/// the background of severity badges and problem counters.
+pub fn mark_selected<'a>(rows: Vec<Row<'a>>, selected: Option<usize>, t: &Theme) -> Vec<Row<'a>> {
+    rows.into_iter().enumerate().map(|(i, row)| if Some(i) == selected { row.style(Style::new().bg(t.surface)) } else { row }).collect()
 }
 
 pub fn centered(area: Rect, width: u16, height: u16) -> Rect {

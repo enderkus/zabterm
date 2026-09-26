@@ -70,7 +70,7 @@ fn draw_table(f: &mut Frame, area: Rect, app: &mut App) {
         .collect();
     let header = Row::new(["Severity", "Time", "Age", "Host", "Problem", "Ack", "Tags"]).style(Style::new().fg(t.muted)).bottom_margin(1);
     let table = Table::new(
-        rows,
+        mark_selected(rows, app.problems_state.selected(), t),
         [
             Constraint::Length(8),
             Constraint::Length(12),
@@ -83,7 +83,6 @@ fn draw_table(f: &mut Frame, area: Rect, app: &mut App) {
     )
     .header(header)
     .column_spacing(2)
-    .row_highlight_style(Style::new().bg(t.surface))
     .highlight_symbol(Span::styled("▌", Style::new().fg(t.accent)))
     .block(panel("Problems", t));
     let mut state = app.problems_state;

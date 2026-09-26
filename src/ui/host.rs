@@ -193,13 +193,14 @@ fn draw_items(f: &mut Frame, area: Rect, app: &mut App) {
         title.push_str(&format!("  · /{}", app.item_filter));
     }
     let header = Row::new(["Name", "Key", "Last value", "Updated", ""]).style(Style::new().fg(t.muted)).bottom_margin(1);
-    let table =
-        Table::new(rows, [Constraint::Percentage(34), Constraint::Percentage(30), Constraint::Percentage(20), Constraint::Length(10), Constraint::Length(8)])
-            .header(header)
-            .column_spacing(2)
-            .row_highlight_style(Style::new().bg(t.surface))
-            .highlight_symbol(Span::styled("▌", Style::new().fg(t.accent)))
-            .block(panel(title, t));
+    let table = Table::new(
+        mark_selected(rows, app.items_state.selected(), t),
+        [Constraint::Percentage(34), Constraint::Percentage(30), Constraint::Percentage(20), Constraint::Length(10), Constraint::Length(8)],
+    )
+    .header(header)
+    .column_spacing(2)
+    .highlight_symbol(Span::styled("▌", Style::new().fg(t.accent)))
+    .block(panel(title, t));
     let mut state = app.items_state;
     f.render_stateful_widget(table, area, &mut state);
     app.items_state = state;
