@@ -96,7 +96,7 @@ brew install enderkus/tap/zabterm
 cargo install --git https://github.com/enderkus/zabterm
 ```
 
-Prebuilt binaries for Linux (x86_64, aarch64) and macOS (Apple Silicon) are
+Prebuilt binaries for Linux (x86_64, aarch64) and macOS (Apple Silicon, Intel) are
 attached to each [release](https://github.com/enderkus/zabterm/releases).
 
 ### Platform notes
