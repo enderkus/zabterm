@@ -190,7 +190,7 @@ fn draw_fleet_chart(f: &mut Frame, area: Rect, app: &App) {
         Span::styled(" m ", Style::new().fg(t.accent).bold()),
         Span::styled(if app.dash_mem { "show cpu " } else { "show memory " }, Style::new().fg(t.muted)),
     ]));
-    time_chart(f, area, block, &series, [now - 1800.0, now], 5.0, pct_axis, t);
+    time_chart(f, area, block, &series, [now - 1800.0, now], 5.0, YAxis::Percent, t);
 }
 
 fn draw_feed(f: &mut Frame, area: Rect, app: &App) {

@@ -102,8 +102,13 @@ pub fn sparkline(t: &Theme, points: &[(f64, f64)], width: usize) -> Span<'static
         return Span::styled("·".repeat(width), Style::new().fg(t.border));
     }
     let tail: Vec<f64> = points.iter().rev().take(width).rev().map(|p| p.1).collect();
-    let max = tail.iter().cloned().fold(0.0_f64, f64::max).max(5.0);
-    let mut s: String = tail.iter().map(|v| TICKS[((v / max) * 7.0).round().clamp(0.0, 7.0) as usize]).collect();
+    // Scale to the window's own range (at least 8 points wide) so the shape of
+    // the trend shows, whether a host idles at 3% or runs hot at 90%.
+    let lo = tail.iter().cloned().fold(f64::INFINITY, f64::min);
+    let hi = tail.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    let span = (hi - lo).max(8.0);
+    let base = (lo - (span - (hi - lo)) / 2.0).max(0.0);
+    let mut s: String = tail.iter().map(|v| TICKS[(((v - base) / span) * 7.0).round().clamp(0.0, 7.0) as usize]).collect();
     if tail.len() < width {
         s = format!("{}{s}", " ".repeat(width - tail.len()));
     }
@@ -162,7 +167,7 @@ pub struct ChartSeries<'a> {
 /// Braille line chart with time on X. `floor` is the minimum Y range so that
 /// flat, near-zero series don't get stretched into noise.
 #[allow(clippy::too_many_arguments)]
-pub fn time_chart(f: &mut Frame, area: Rect, block: Block, series: &[ChartSeries], x: [f64; 2], floor: f64, y_fmt: fn(f64) -> String, t: &Theme) {
+pub fn time_chart(f: &mut Frame, area: Rect, block: Block, series: &[ChartSeries], x: [f64; 2], floor: f64, y: YAxis, t: &Theme) {
     let has_data = series.iter().any(|s| !s.points.is_empty());
     if !has_data {
         let msg = Paragraph::new(vec![Line::raw(""), Line::styled("no data yet", Style::new().fg(t.muted))]).alignment(Alignment::Center).block(block);
@@ -170,7 +175,11 @@ pub fn time_chart(f: &mut Frame, area: Rect, block: Block, series: &[ChartSeries
         return;
     }
     let max = series.iter().flat_map(|s| s.points.iter().map(|p| p.1)).fold(0.0_f64, f64::max);
-    let top = nice_ceil((max * 1.15).max(floor));
+    let mut top = nice_ceil((max * 1.15).max(floor));
+    // Percent charts never need headroom above 100%.
+    if y == YAxis::Percent && max <= 100.0 {
+        top = top.min(100.0);
+    }
     let datasets: Vec<Dataset> = series
         .iter()
         .map(|s| Dataset::default().name(s.name.clone()).marker(Marker::Braille).graph_type(GraphType::Line).style(Style::new().fg(s.color)).data(s.points))
@@ -184,9 +193,9 @@ pub fn time_chart(f: &mut Frame, area: Rect, block: Block, series: &[ChartSeries
             Span::styled("now", axis_style),
         ]))
         .y_axis(Axis::default().style(Style::new().fg(t.border)).bounds([0.0, top]).labels(vec![
-            Span::styled(y_fmt(0.0), axis_style),
-            Span::styled(y_fmt(top / 2.0), axis_style),
-            Span::styled(y_fmt(top), axis_style),
+            Span::styled(y.label(0.0), axis_style),
+            Span::styled(y.label(top / 2.0), axis_style),
+            Span::styled(y.label(top), axis_style),
         ]))
         .legend_position(if series.len() > 1 { Some(LegendPosition::TopRight) } else { None })
         .hidden_legend_constraints((ratatui::layout::Constraint::Percentage(60), ratatui::layout::Constraint::Percentage(60)));
@@ -219,14 +228,20 @@ pub fn truncate(s: &str, max: usize) -> String {
     out
 }
 
-pub fn pct_axis(v: f64) -> String {
-    if v < 10.0 && v.fract() != 0.0 { format!("{v:.1}%") } else { format!("{v:.0}%") }
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum YAxis {
+    Percent,
+    Bits,
+    Plain,
 }
 
-pub fn bits_axis(v: f64) -> String {
-    fmt::bits(v)
-}
-
-pub fn plain_axis(v: f64) -> String {
-    fmt::number((v * 100.0).round() / 100.0)
+impl YAxis {
+    fn label(self, v: f64) -> String {
+        match self {
+            Self::Percent if v < 10.0 && v.fract() != 0.0 => format!("{v:.1}%"),
+            Self::Percent => format!("{v:.0}%"),
+            Self::Bits => fmt::bits(v),
+            Self::Plain => fmt::number((v * 100.0).round() / 100.0),
+        }
+    }
 }

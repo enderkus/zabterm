@@ -100,7 +100,7 @@ fn draw_preview(f: &mut Frame, area: Rect, app: &App) {
         &[ChartSeries { name: "cpu".into(), points: &h.cpu_hist, color: t.series[0] }],
         x,
         5.0,
-        pct_axis,
+        YAxis::Percent,
         t,
     );
     time_chart(
@@ -110,7 +110,7 @@ fn draw_preview(f: &mut Frame, area: Rect, app: &App) {
         &[ChartSeries { name: "mem".into(), points: &h.mem_hist, color: t.series[2] }],
         x,
         5.0,
-        pct_axis,
+        YAxis::Percent,
         t,
     );
 

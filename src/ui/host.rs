@@ -103,7 +103,7 @@ fn draw_graphs(f: &mut Frame, area: Rect, app: &App, d: &HostDetail) {
         &[ChartSeries { name: "cpu".into(), points: &d.cpu, color: t.series[0] }],
         x,
         5.0,
-        pct_axis,
+        YAxis::Percent,
         t,
     );
     time_chart(
@@ -113,7 +113,7 @@ fn draw_graphs(f: &mut Frame, area: Rect, app: &App, d: &HostDetail) {
         &[ChartSeries { name: "mem".into(), points: &d.mem, color: t.series[2] }],
         x,
         5.0,
-        pct_axis,
+        YAxis::Percent,
         t,
     );
     let net_title =
@@ -125,7 +125,7 @@ fn draw_graphs(f: &mut Frame, area: Rect, app: &App, d: &HostDetail) {
         &[ChartSeries { name: "in".into(), points: &d.net_in, color: t.series[1] }, ChartSeries { name: "out".into(), points: &d.net_out, color: t.series[3] }],
         x,
         1000.0,
-        bits_axis,
+        YAxis::Bits,
         t,
     );
     time_chart(
@@ -135,7 +135,7 @@ fn draw_graphs(f: &mut Frame, area: Rect, app: &App, d: &HostDetail) {
         &[ChartSeries { name: "load".into(), points: &d.load, color: t.series[4] }],
         x,
         1.0,
-        plain_axis,
+        YAxis::Plain,
         t,
     );
 
