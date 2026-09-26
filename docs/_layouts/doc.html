@@ -1,0 +1,38 @@
+---
+layout: default
+body_class: docs
+---
+{%- assign flat = "" | split: "" -%}
+{%- for section in site.data.nav -%}{%- for p in section.pages -%}{%- assign flat = flat | push: p -%}{%- endfor -%}{%- endfor -%}
+<div class="docs-shell">
+  <button class="sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar">☰ Contents</button>
+  <aside class="sidebar" id="sidebar">
+    {% for section in site.data.nav %}
+    <div class="panel side-panel">
+      <div class="panel-title">{{ section.title }}</div>
+      <ul>
+        {% for p in section.pages %}
+        <li><a href="{{ p.url | relative_url }}" class="{% if page.url == p.url %}active{% endif %}">{{ p.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </aside>
+  <main class="doc">
+    <article class="panel doc-panel">
+      <div class="panel-title">{{ page.title }}</div>
+      {% if page.lead %}<p class="lead">{{ page.lead }}</p>{% endif %}
+      {{ content }}
+    </article>
+    {%- for p in flat -%}
+      {%- if p.url == page.url -%}
+        {%- assign prev_i = forloop.index0 | minus: 1 -%}
+        {%- assign next_i = forloop.index0 | plus: 1 -%}
+        <nav class="pager">
+          {%- if prev_i >= 0 -%}{%- assign prev = flat[prev_i] -%}<a class="prev" href="{{ prev.url | relative_url }}"><span class="muted">← previous</span>{{ prev.title }}</a>{%- else -%}<span></span>{%- endif -%}
+          {%- if flat[next_i] -%}{%- assign next = flat[next_i] -%}<a class="next" href="{{ next.url | relative_url }}"><span class="muted">next →</span>{{ next.title }}</a>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endfor -%}
+  </main>
+</div>

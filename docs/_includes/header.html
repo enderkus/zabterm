@@ -1,0 +1,15 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ '/' | relative_url }}"><span class="brand-badge">◆ zabterm</span></a>
+    <nav class="tabs" aria-label="Main">
+      <a href="{{ '/' | relative_url }}" class="{% if page.url == '/' %}active{% endif %}"><span class="key">1</span> Home</a>
+      <a href="{{ '/guide/' | relative_url }}" class="{% if page.url contains '/guide/' %}active{% endif %}"><span class="key">2</span> Docs</a>
+      <a href="{{ '/guide/install/' | relative_url }}"><span class="key">3</span> Install</a>
+    </nav>
+    <div class="status">
+      <span class="dot"></span><span class="muted">v{{ site.version }}</span>
+      <span class="sep">·</span>
+      <a href="{{ site.github_url }}">GitHub</a>
+    </div>
+  </div>
+</header>

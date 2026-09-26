@@ -1,0 +1,32 @@
+title: zabterm
+tagline: Zabbix, in your terminal.
+description: A fast, keyboard-driven terminal UI for Zabbix. Built in Rust, runs on Linux and macOS, and follows your Omarchy theme.
+url: https://enderkus.github.io
+baseurl: /zabterm
+repository: enderkus/zabterm
+github_url: https://github.com/enderkus/zabterm
+version: 0.1.1
+
+permalink: pretty
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  auto_ids: true
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+defaults:
+  - scope:
+      path: guide
+    values:
+      layout: doc
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .jekyll-cache

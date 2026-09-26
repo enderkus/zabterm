@@ -1,0 +1,126 @@
+---
+layout: default
+title: zabterm, Zabbix in your terminal
+body_class: home
+---
+<main>
+  <section class="hero wrap">
+    <pre class="logo" aria-label="zabterm"><span class="zab">▀▀█ ▄▀▄ █▀▄</span> <span class="term">▀█▀ █▀▀ █▀▄ █▄ ▄█</span>
+<span class="zab">▄▀  █▀█ █▀▄</span> <span class="term"> █  █▀▀ █▀▄ █ ▀ █</span>
+<span class="zab">▀▀▀ ▀ ▀ ▀▀ </span> <span class="term"> ▀  ▀▀▀ ▀ ▀ ▀   ▀</span></pre>
+    <h1>{{ site.tagline }}</h1>
+    <p class="sub">A fast, keyboard-driven TUI for Zabbix. Dashboards, hosts, history graphs and problems with one-key acknowledge. Written in Rust, runs on Linux and macOS, and follows your Omarchy theme.</p>
+
+    <div class="buttons">
+      <a class="btn primary" href="{{ '/guide/install/' | relative_url }}">Get started →</a>
+      <a class="btn" href="{{ '/guide/' | relative_url }}">Read the docs</a>
+      <a class="btn" href="{{ site.github_url }}">GitHub</a>
+    </div>
+
+    <div class="install">
+      <div class="install-tabs" role="tablist">
+        <button class="active" data-pane="script" type="button">Omarchy / Linux / macOS</button>
+        <button data-pane="brew" type="button">Homebrew</button>
+        <button data-pane="cargo" type="button">Cargo</button>
+      </div>
+      <div class="install-pane active" data-pane="script">
+        {% include cmd.html text="curl -fsSL https://raw.githubusercontent.com/enderkus/zabterm/main/install.sh | sh" %}
+        <p>Prebuilt binary into ~/.local/bin. On Linux it also adds zabterm and its icon to the app launcher.</p>
+      </div>
+      <div class="install-pane" data-pane="brew">
+        {% include cmd.html text="brew install enderkus/tap/zabterm" %}
+        <p>macOS (Apple Silicon and Intel) and Linux.</p>
+      </div>
+      <div class="install-pane" data-pane="cargo">
+        {% include cmd.html text="cargo install --git https://github.com/enderkus/zabterm" %}
+        <p>Builds from source with any recent Rust toolchain.</p>
+      </div>
+    </div>
+
+    <div class="badges">
+      <a href="https://github.com/tcballard/omarchy-badges"><img alt="Built for Omarchy: App" src="https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-app.svg"></a>
+    </div>
+
+    <div class="panel shot">
+      <div class="panel-title">Dashboard</div>
+      <img src="{{ '/assets/screenshots/dashboard.png' | relative_url }}" alt="zabterm dashboard with fleet CPU chart, severity bar and host table" width="3600" height="2262">
+    </div>
+  </section>
+
+  <section class="block wrap">
+    <div class="section-head">
+      <h2>Everything you check in the frontend, without leaving the terminal</h2>
+      <p>zabterm talks to the Zabbix JSON-RPC API, polls in the background and never blocks the UI on the network.</p>
+    </div>
+    <div class="grid">
+      <div class="panel feature"><div class="panel-title">Dashboard</div><span class="icon accent">▀█</span><p>Big-number tiles for hosts, availability, problems, CPU and memory, a severity bar, a 30 minute fleet chart and a live problem feed.</p></div>
+      <div class="panel feature"><div class="panel-title">Hosts</div><span class="icon" style="color:var(--green)">●●○</span><p>Every host with availability, CPU and memory meters, disk, load, uptime and problem counters. Filter, sort, and preview history as you scroll.</p></div>
+      <div class="panel feature"><div class="panel-title">History graphs</div><span class="icon" style="color:var(--cyan)">⣀⡠⠔⠊</span><p>Braille charts for CPU, memory, network and load, from 15 minutes to 7 days, plus filesystems and a searchable latest data tab.</p></div>
+      <div class="panel feature"><div class="panel-title">Problems</div><span class="icon"><span class="sev dstr">DSTR</span> <span class="sev high">HIGH</span></span><p>Severity badges, tags, details, a minimum severity filter. Press <kbd>a</kbd> to acknowledge with a message and close it if the trigger allows.</p></div>
+      <div class="panel feature"><div class="panel-title">Notifications</div><span class="icon" style="color:var(--yellow)">▲</span><p>New and resolved problems, hosts going down or coming back: as in-app toasts and native desktop notifications on Linux and macOS.</p></div>
+      <div class="panel feature"><div class="panel-title">Profiles and secrets</div><span class="icon" style="color:var(--magenta)">⚿</span><p>Prod, staging and lab in one config. Tokens from the file, an env var, or any command such as <code>pass</code> or <code>op</code>.</p></div>
+    </div>
+  </section>
+
+  <section class="block wrap">
+    <div class="section-head">
+      <h2>Drill down</h2>
+      <p>From the fleet to a single host to a single problem, all on the keyboard.</p>
+    </div>
+    <div class="pair">
+      <figure class="panel"><div class="panel-title">Hosts</div><img src="{{ '/assets/screenshots/hosts.png' | relative_url }}" alt="Hosts view with CPU and memory preview" loading="lazy"><figcaption>Sort by problems, CPU or memory. The preview follows your selection.</figcaption></figure>
+      <figure class="panel"><div class="panel-title">Problems</div><img src="{{ '/assets/screenshots/problems.png' | relative_url }}" alt="Problems view with severity badges" loading="lazy"><figcaption>Everything firing right now, worst first, with a details pane.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="block wrap split">
+    <div class="panel">
+      <div class="panel-title">Keyboard first</div>
+      <table class="keys">
+        <tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>tab</kbd></td><td class="muted">dashboard, hosts, problems</td></tr>
+        <tr><td><kbd>j</kbd> <kbd>k</kbd> <kbd>g</kbd> <kbd>G</kbd></td><td class="muted">move around</td></tr>
+        <tr><td><kbd>⏎</kbd></td><td class="muted">open a host</td></tr>
+        <tr><td><kbd>/</kbd></td><td class="muted">filter anything</td></tr>
+        <tr><td><kbd>a</kbd></td><td class="muted">acknowledge a problem</td></tr>
+        <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td class="muted">graph range 15m to 7d</td></tr>
+        <tr><td><kbd>t</kbd></td><td class="muted">cycle theme</td></tr>
+        <tr><td><kbd>o</kbd></td><td class="muted">open the same page in Zabbix web</td></tr>
+      </table>
+      <p class="muted" style="margin-bottom:0">All keys: <a href="{{ '/guide/usage/' | relative_url }}">Views and keys</a></p>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Built for Omarchy</div>
+      <p>With <code>theme = "auto"</code> zabterm reads the active Omarchy theme and repaints the moment you switch themes. Eight popular palettes are built in for everyone else.</p>
+      <p>The installer adds a launcher entry with its own icon, and notifications go through <code>notify-send</code>, so mako shows them like any other app.</p>
+      <p class="muted" style="margin-bottom:0">Details: <a href="{{ '/guide/omarchy/' | relative_url }}">Omarchy</a> · <a href="{{ '/guide/themes/' | relative_url }}">Themes</a></p>
+    </div>
+  </section>
+
+  <section class="block wrap">
+    <div class="section-head">
+      <h2>One small config file</h2>
+      <p><code>zabterm init</code> writes it for you at <code>~/.config/zabterm/config.toml</code>.</p>
+    </div>
+{% highlight toml %}
+default_profile = "prod"
+theme = "auto"
+refresh_interval = 10
+
+[notifications]
+desktop = true
+min_severity = "average"
+
+[profiles.prod]
+url = "https://zabbix.example.com"
+token_cmd = "op read op://ops/zabbix-prod/token"
+{% endhighlight %}
+  </section>
+
+  <section class="cta wrap">
+    <h2>Try it on your Zabbix</h2>
+    <div class="buttons">
+      <a class="btn primary" href="{{ '/guide/quick-start/' | relative_url }}">Quick start →</a>
+      <a class="btn" href="{{ site.github_url }}/releases">Releases</a>
+    </div>
+  </section>
+</main>

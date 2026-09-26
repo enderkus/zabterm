@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>zabterm</title>
+  <defs>
+    <linearGradient id="z" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dcfff"/>
+      <stop offset="1" stop-color="#7aa2f7"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2335"/>
+      <stop offset="1" stop-color="#16161e"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bg)" stroke="#2f334d" stroke-width="6"/>
+  <g fill="url(#z)">
+    <rect x="139.5" y="91.5" width="41" height="43" rx="7"/>
+    <rect x="187.5" y="91.5" width="41" height="43" rx="7"/>
+    <rect x="235.5" y="91.5" width="41" height="43" rx="7"/>
+    <rect x="283.5" y="91.5" width="41" height="43" rx="7"/>
+    <rect x="331.5" y="91.5" width="41" height="43" rx="7"/>
+    <rect x="283.5" y="141.5" width="41" height="43" rx="7"/>
+    <rect x="235.5" y="191.5" width="41" height="43" rx="7"/>
+    <rect x="187.5" y="241.5" width="41" height="43" rx="7"/>
+    <rect x="139.5" y="291.5" width="41" height="43" rx="7"/>
+    <rect x="187.5" y="291.5" width="41" height="43" rx="7"/>
+    <rect x="235.5" y="291.5" width="41" height="43" rx="7"/>
+    <rect x="283.5" y="291.5" width="41" height="43" rx="7"/>
+    <rect x="331.5" y="291.5" width="41" height="43" rx="7"/>
+  </g>
+  <polyline points="112,410 196,410 222,410 244,372 268,446 290,392 306,410 400,410"
+            fill="none" stroke="#9ece6a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="400" cy="410" r="14" fill="#9ece6a"/>
+</svg>

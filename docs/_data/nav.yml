@@ -1,0 +1,16 @@
+- title: Start
+  pages:
+    - { title: Introduction, url: /guide/ }
+    - { title: Installation, url: /guide/install/ }
+    - { title: Quick start, url: /guide/quick-start/ }
+- title: Reference
+  pages:
+    - { title: Configuration, url: /guide/configuration/ }
+    - { title: Views and keys, url: /guide/usage/ }
+    - { title: Themes, url: /guide/themes/ }
+    - { title: Notifications, url: /guide/notifications/ }
+- title: More
+  pages:
+    - { title: Omarchy, url: /guide/omarchy/ }
+    - { title: How it works, url: /guide/internals/ }
+    - { title: Troubleshooting, url: /guide/troubleshooting/ }

@@ -5,18 +5,19 @@
 [![Built for Omarchy: App](https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-app.svg)](https://github.com/tcballard/omarchy-badges)
 [![CI](https://github.com/enderkus/zabterm/actions/workflows/ci.yml/badge.svg)](https://github.com/enderkus/zabterm/actions/workflows/ci.yml)
 
-A fast, keyboard-driven terminal UI for Zabbix, for Linux and macOS. Built in Rust with
+A fast, keyboard-driven terminal UI for Zabbix, for Linux and macOS.
+**[Website and docs](https://enderkus.github.io/zabterm/)**. Built in Rust with
 [ratatui](https://ratatui.rs), styled to feel at home on
 [Omarchy](https://omarchy.org): it picks up your current Omarchy theme and
 follows along live when you switch themes.
 
-![zabterm dashboard](screenshots/dashboard-1.png)
+![zabterm dashboard](docs/assets/screenshots/dashboard.png)
 
 ## Screenshots
 
 | Hosts | Problems |
 |---|---|
-| ![Hosts view with live CPU and memory preview](screenshots/hosts-2.png) | ![Problems view with severity badges and details](screenshots/problems-3.png) |
+| ![Hosts view with live CPU and memory preview](docs/assets/screenshots/hosts.png) | ![Problems view with severity badges and details](docs/assets/screenshots/problems.png) |
 
 The data comes from a demo Rails 8 fleet (load balancers, Puma web nodes,
 Solid Queue job runners, MySQL) with scripted incidents.
