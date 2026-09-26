@@ -42,14 +42,13 @@ fn draw_table(f: &mut Frame, area: Rect, app: &mut App) {
     let rows: Vec<Row> = hosts
         .iter()
         .map(|h| {
-            let name_style = if h.enabled { Style::new().fg(t.fg).bold() } else { Style::new().fg(t.muted).crossed_out() };
             Row::new(vec![
                 Cell::from(status_dot(t, h)),
-                Cell::from(Span::styled(h.name.clone(), name_style)),
+                Cell::from(host_name(t, h)),
                 Cell::from(Span::styled(h.groups.join(", "), Style::new().fg(t.muted))),
                 Cell::from(Span::styled(h.address.clone(), Style::new().fg(t.muted))),
-                Cell::from(Line::from([bar(t, h.cpu, 8), vec![Span::styled(format!(" {:>5}", fmt::pct(h.cpu)), Style::new().fg(t.fg))]].concat())),
-                Cell::from(Line::from([bar(t, h.mem, 8), vec![Span::styled(format!(" {:>5}", fmt::pct(h.mem)), Style::new().fg(t.fg))]].concat())),
+                Cell::from(Line::from([bar(t, h.cpu, 8), vec![Span::styled(format!(" {:>5}", fmt::pct(h.cpu)), Style::new().fg(value_fg(t, h)))]].concat())),
+                Cell::from(Line::from([bar(t, h.mem, 8), vec![Span::styled(format!(" {:>5}", fmt::pct(h.mem)), Style::new().fg(value_fg(t, h)))]].concat())),
                 Cell::from(Span::styled(fmt::pct(h.disk), Style::new().fg(h.disk.map(|d| level(t, d)).unwrap_or(t.muted)))),
                 Cell::from(Span::styled(h.load.map(|l| format!("{l:.2}")).unwrap_or("-".into()), Style::new().fg(t.muted))),
                 Cell::from(Span::styled(h.uptime.map(|u| fmt::duration(u as i64)).unwrap_or("-".into()), Style::new().fg(t.muted))),

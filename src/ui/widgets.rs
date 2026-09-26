@@ -61,6 +61,22 @@ pub fn status_dot(t: &Theme, h: &HostRow) -> Span<'static> {
     }
 }
 
+/// Host name styled by state: struck through when disabled, red when the
+/// agent is unreachable (its metrics are stale then).
+pub fn host_name(t: &Theme, h: &HostRow) -> Span<'static> {
+    let style = match (h.enabled, h.availability) {
+        (false, _) => Style::new().fg(t.muted).crossed_out(),
+        (_, Availability::Down) => Style::new().fg(t.err).bold(),
+        _ => Style::new().fg(t.fg).bold(),
+    };
+    Span::styled(h.name.clone(), style)
+}
+
+/// Text color for a host's metric values; muted when they are stale.
+pub fn value_fg(t: &Theme, h: &HostRow) -> Color {
+    if h.availability == Availability::Down || !h.enabled { t.muted } else { t.fg }
+}
+
 /// Per-severity problem counters, e.g. `2 1` in their severity colors.
 pub fn problem_counts(t: &Theme, h: &HostRow) -> Line<'static> {
     if h.problem_count() == 0 {

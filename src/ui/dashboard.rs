@@ -39,7 +39,7 @@ fn avg(values: impl Iterator<Item = f64>) -> Option<f64> {
     (!v.is_empty()).then(|| v.iter().sum::<f64>() / v.len() as f64)
 }
 
-fn peak(hosts: &[HostRow], metric: fn(&HostRow) -> Option<f64>) -> Option<(&str, f64)> {
+fn peak<'a>(hosts: &[&'a HostRow], metric: fn(&HostRow) -> Option<f64>) -> Option<(&'a str, f64)> {
     hosts.iter().filter_map(|h| Some((h.name.as_str(), metric(h)?))).max_by(|a, b| a.1.total_cmp(&b.1))
 }
 
@@ -86,7 +86,13 @@ fn draw_tiles(f: &mut Frame, area: Rect, snap: &Snapshot, t: &Theme) {
         cols[1],
         "Availability",
         big_text(&avail.map(|a| format!("{a:.0}")).unwrap_or("-".into()), "%", avail_color, t),
-        Line::styled(if maint > 0 { format!("◆ {maint} in maintenance") } else { "agents reachable".into() }, muted),
+        if down > 0 {
+            Line::styled(format!("{down} unreachable"), Style::new().fg(t.err))
+        } else if maint > 0 {
+            Line::styled(format!("◆ {maint} in maintenance"), muted)
+        } else {
+            Line::styled("agents reachable", muted)
+        },
         t,
     );
 
@@ -108,9 +114,11 @@ fn draw_tiles(f: &mut Frame, area: Rect, snap: &Snapshot, t: &Theme) {
         t,
     );
 
+    // Unreachable hosts only have stale last values; keep them out of the averages.
+    let live: Vec<&HostRow> = monitored.iter().copied().filter(|h| h.availability != Availability::Down).collect();
     for (col, title, metric) in [(cols[3], "Avg CPU", (|h: &HostRow| h.cpu) as fn(&HostRow) -> Option<f64>), (cols[4], "Avg Memory", |h: &HostRow| h.mem)] {
-        let value = avg(snap.hosts.iter().filter_map(metric));
-        let sub = match peak(&snap.hosts, metric) {
+        let value = avg(live.iter().copied().filter_map(metric));
+        let sub = match peak(&live, metric) {
             Some((name, v)) => Line::from(vec![
                 Span::styled("peak ", muted),
                 // Leave room for "peak " and " 100%" inside the borders.
@@ -233,9 +241,12 @@ fn draw_hosts(f: &mut Frame, area: Rect, app: &mut App) {
         .map(|h| {
             let mut cells = vec![
                 Cell::from(status_dot(t, h)),
-                Cell::from(Span::styled(h.name.clone(), Style::new().fg(t.fg).bold())),
-                Cell::from(Line::from(vec![sparkline(t, &h.cpu_hist, spark_w), Span::styled(format!(" {:>5}", fmt::pct(h.cpu)), Style::new().fg(t.fg))])),
-                Cell::from(Line::from([bar(t, h.mem, 10), vec![Span::styled(format!(" {:>5}", fmt::pct(h.mem)), Style::new().fg(t.fg))]].concat())),
+                Cell::from(host_name(t, h)),
+                Cell::from(Line::from(vec![
+                    sparkline(t, &h.cpu_hist, spark_w),
+                    Span::styled(format!(" {:>5}", fmt::pct(h.cpu)), Style::new().fg(value_fg(t, h))),
+                ])),
+                Cell::from(Line::from([bar(t, h.mem, 10), vec![Span::styled(format!(" {:>5}", fmt::pct(h.mem)), Style::new().fg(value_fg(t, h)))]].concat())),
             ];
             if wide {
                 cells.extend([

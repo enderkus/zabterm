@@ -222,20 +222,43 @@ impl App {
         }
     }
 
+    /// Diff the new snapshot against the previous one and tell the user what
+    /// changed: new problems, resolved problems and hosts going down or up.
     fn announce_new_problems(&mut self, snap: &Snapshot) {
-        let first = self.snapshot.is_none();
         let min = self.notify_min;
-        let fresh: Vec<&Problem> =
-            snap.problems.iter().filter(|p| !self.seen_events.contains(&p.eventid) && !p.suppressed && p.severity >= min).take(3).collect();
-        self.seen_events = snap.problems.iter().map(|p| p.eventid.clone()).collect();
-        if first {
+        let Some(prev) = &self.snapshot else {
+            self.seen_events = snap.problems.iter().map(|p| p.eventid.clone()).collect();
             return;
+        };
+        let mut notes: Vec<(ToastKind, String, String, bool)> = Vec::new();
+
+        for p in snap.problems.iter().filter(|p| !self.seen_events.contains(&p.eventid) && !p.suppressed && p.severity >= min).take(3) {
+            notes.push((ToastKind::Problem(p.severity), format!("{} · {}", p.severity.label(), p.host), p.name.clone(), p.severity >= Severity::High));
         }
-        for p in fresh {
-            self.toast(ToastKind::Problem(p.severity), format!("{} · {}", p.severity.label(), p.host), p.name.clone());
-            if self.config.notifications.desktop {
-                desktop_notify(p);
+        let current: HashSet<&str> = snap.problems.iter().map(|p| p.eventid.as_str()).collect();
+        for p in prev.problems.iter().filter(|p| !current.contains(p.eventid.as_str()) && !p.suppressed && p.severity >= min).take(3) {
+            notes.push((ToastKind::Ok, format!("Resolved · {}", p.host), p.name.clone(), false));
+        }
+        for h in &snap.hosts {
+            let Some(before) = prev.hosts.iter().find(|b| b.id == h.id) else { continue };
+            match (before.availability, h.availability) {
+                (Availability::Up, Availability::Down) => {
+                    let why = if h.error.is_empty() { h.address.clone() } else { h.error.clone() };
+                    notes.push((ToastKind::Error, format!("Unreachable · {}", h.name), why, true));
+                }
+                (Availability::Down, Availability::Up) => {
+                    notes.push((ToastKind::Ok, format!("Back online · {}", h.name), h.address.clone(), false));
+                }
+                _ => {}
             }
+        }
+        self.seen_events = snap.problems.iter().map(|p| p.eventid.clone()).collect();
+
+        for (kind, title, body, urgent) in notes {
+            if self.config.notifications.desktop {
+                desktop_notify(&title, &body, urgent);
+            }
+            self.toast(kind, title, body);
         }
     }
 
@@ -578,15 +601,14 @@ impl App {
     }
 }
 
-fn desktop_notify(p: &Problem) {
-    let title = format!("{} · {}", p.severity.label(), p.host);
-    let urgency = if p.severity >= Severity::High { "critical" } else { "normal" };
+fn desktop_notify(title: &str, body: &str, urgent: bool) {
     // A missing notifier is fine; the in-app toast already fired.
     let _ = if cfg!(target_os = "macos") {
-        let script = format!("display notification {:?} with title \"zabterm\" subtitle {:?}", p.name, title);
+        let script = format!("display notification {body:?} with title \"zabterm\" subtitle {title:?}");
         spawn_detached(std::process::Command::new("osascript").args(["-e", &script]))
     } else {
-        spawn_detached(std::process::Command::new("notify-send").args(["-a", "zabterm", "-u", urgency, &title, &p.name]))
+        let urgency = if urgent { "critical" } else { "normal" };
+        spawn_detached(std::process::Command::new("notify-send").args(["-a", "zabterm", "-u", urgency, title, body]))
     };
 }
 

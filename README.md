@@ -1,5 +1,8 @@
 # zabterm
 
+[![Built for Omarchy: App](https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-app.svg)](https://github.com/tcballard/omarchy-badges)
+[![CI](https://github.com/enderkus/zabterm/actions/workflows/ci.yml/badge.svg)](https://github.com/enderkus/zabterm/actions/workflows/ci.yml)
+
 A fast, keyboard-driven terminal UI for Zabbix, for Linux and macOS. Built in Rust with
 [ratatui](https://ratatui.rs), styled to feel at home on
 [Omarchy](https://omarchy.org): it picks up your current Omarchy theme and
@@ -58,8 +61,9 @@ follows along live when you switch themes.
 - **Problems**: severity badges, age, tags, a details pane, a minimum
   severity filter and hide-acknowledged toggle. Press `a` to acknowledge with
   a message, and close the problem too if the trigger allows it.
-- **Notifications**: new problems pop up as in-app toasts and, optionally, as
-  desktop notifications through `notify-send` (mako, dunst, ...).
+- **Notifications**: new problems, resolved problems and hosts becoming
+  unreachable or coming back online pop up as in-app toasts and as desktop
+  notifications (`notify-send` on Linux, Notification Center on macOS).
 - **Themes**: `auto` reads `~/.config/omarchy/current/theme` and live-reloads.
   Built-ins: tokyo-night, catppuccin, gruvbox, nord, everforest, rose-pine,
   kanagawa, matte-black. Press `t` to cycle.
@@ -72,13 +76,24 @@ Works with the Zabbix 7.x and 8.0 API (Bearer token auth, `hostgroups`).
 
 ## Install
 
-Needs a Rust toolchain ([rustup.rs](https://rustup.rs)). Same steps on Linux
-and macOS:
+**Omarchy / Linux / macOS**, prebuilt binary into `~/.local/bin` (on Linux
+this also adds zabterm to the app launcher):
 
 ```bash
-git clone https://github.com/enderkus/zabterm
-cd zabterm
-cargo install --path .     # installs ~/.cargo/bin/zabterm
+curl -fsSL https://raw.githubusercontent.com/enderkus/zabterm/main/install.sh | sh
+```
+
+**Homebrew** (macOS and Linux):
+
+```bash
+brew install enderkus/tap/zabterm
+```
+
+**From source** (any platform with a Rust toolchain from
+[rustup.rs](https://rustup.rs)):
+
+```bash
+cargo install --git https://github.com/enderkus/zabterm
 ```
 
 Prebuilt binaries for Linux (x86_64, aarch64) and macOS (Apple Silicon) are
@@ -157,13 +172,8 @@ any config file.
 
 ## Omarchy
 
-Add zabterm to the app launcher by copying the desktop entry:
-
-```bash
-cp extras/zabterm.desktop ~/.local/share/applications/
-```
-
-Or bind it to a key in `~/.config/hypr/bindings.conf`, using whichever
+The install script already adds zabterm to the app launcher. You can also
+bind it to a key in `~/.config/hypr/bindings.conf`, using whichever
 terminal you run:
 
 ```

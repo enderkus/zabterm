@@ -27,7 +27,8 @@ theme = "auto"
 refresh_interval = 10
 
 [notifications]
-# Fire notify-send (mako, dunst, ...) when a new problem shows up.
+# Desktop notifications (notify-send on Linux, Notification Center on macOS)
+# for new and resolved problems and for hosts going down or coming back.
 desktop = true
 # Ignore anything below this: not_classified, information, warning,
 # average, high, disaster.
