@@ -10,44 +10,16 @@ A fast, keyboard-driven terminal UI for Zabbix, for Linux and macOS. Built in Ru
 [Omarchy](https://omarchy.org): it picks up your current Omarchy theme and
 follows along live when you switch themes.
 
-```
- ◆ zabterm   1 Dashboard   2 Hosts 3   3 Problems 0     ● live  ·  local  ·  Zabbix 8.0.0  ·  33ms  ·  14:49:35
+![zabterm dashboard](screenshots/dashboard-1.png)
 
-╭ Hosts ─────────────╮╭ Availability ───────╮╭ Problems ──────────╮╭ Avg CPU ────────────╮╭ Avg Memory ────────╮
-│         ▀▀█        ││     ▀█  █▀█ █▀█     ││         █▀█        ││       ▀▀█ ▀▀█       ││       ▀▀█ █▀▀      │
-│          ▀█        ││      █  █ █ █ █     ││         █ █        ││        ▀█ █▀▀       ││       █▀▀ █▀█      │
-│         ▀▀▀        ││     ▀▀▀ ▀▀▀ ▀▀▀ %   ││         ▀▀▀        ││       ▀▀▀ ▀▀▀ %     ││       ▀▀▀ ▀▀▀ %    │
-│                    ││                     ││                    ││                     ││                    │
-│  ● 3 up   ● 0 down ││  agents reachable   ││      all clear     ││ peak test-agen… 35% ││ peak Zabbix s… 30% │
-╰────────────────────╯╰─────────────────────╯╰────────────────────╯╰─────────────────────╯╰────────────────────╯
-╭ Problems by severity ────────────────────────────────────────────────────────────────────────────────────────╮
-│━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━│
-│■ Disaster 0     ■ High 0     ■ Average 0     ■ Warning 0     ■ Information 0     ■ Not classified 0          │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭ Fleet CPU · last 30m ─────────────────────────────────────────────╮╭ Latest problems ────────────────────────╮
-│50% │                                           ┌─────────────────┐││                                         │
-│    │                                           │test-agent-2 35% │││                                         │
-│    │                                           │Zabbix server 35%│││                                         │
-│    │                                           │test-agent-1 26% │││                                         │
-│    │                                           └─────────────────┘││                                         │
-│    │                                                            ⢀ ││                    ✓                    │
-│25% │                                                            ⡜ ││                All clear                │
-│    │                                                           ⢀⡇ ││           no active problems            │
-│    │                                                           ⢸⠁ ││                                         │
-│    │                                                           ⡎  ││                                         │
-│    │                                                          ⢀⠇  ││                                         │
-│0%  │ ⠠⠤⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠚   ││                                         │
-│    └──────────────────────────────────────────────────────────────││                                         │
-│14:19                            14:34                          now││                                         │
-╰ m show memory ────────────────────────────────────────────────────╯╰─────────────────────────────────────────╯
-╭ Hosts ───────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│   Host                                                   CPU · 30m             Memory            Problems    │
-│●  Zabbix server                                          ▁▁▁▁▁▁▁▁▁▁▁▁▂█   35%  ━━━───────   30%  ✓           │
-│●  test-agent-1                                           ▁▂▂▂▂▂▂▂▂▁▂▂▂█   26%  ━━────────   24%  ✓           │
-│●  test-agent-2                                           ▁▁▁▁▁▁▁▁▁▁▁▁▂█   35%  ━━━───────   26%  ✓           │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
- j/k select   ⏎ open   m cpu/mem   tab next   t theme   o web   ? help   q quit       updated 3s ago  every 10s
-```
+## Screenshots
+
+| Hosts | Problems |
+|---|---|
+| ![Hosts view with live CPU and memory preview](screenshots/hosts-2.png) | ![Problems view with severity badges and details](screenshots/problems-3.png) |
+
+The data comes from a demo Rails 8 fleet (load balancers, Puma web nodes,
+Solid Queue job runners, MySQL) with scripted incidents.
 
 ## Features
 
