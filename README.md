@@ -1,3 +1,5 @@
+<img src="assets/zabterm.png" width="96" alt="zabterm icon">
+
 # zabterm
 
 [![Built for Omarchy: App](https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-app.svg)](https://github.com/tcballard/omarchy-badges)

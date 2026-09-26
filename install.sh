@@ -45,8 +45,29 @@ install -m 755 "$tmp/$name/zabterm" "$BIN_DIR/zabterm"
 say "Installed $BIN_DIR/zabterm"
 
 if [ "$(uname -s)" = "Linux" ]; then
-  apps="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
-  mkdir -p "$apps"
+  data="${XDG_DATA_HOME:-$HOME/.local/share}"
+  apps="$data/applications"
+  icon="$apps/icons/zabterm.png"
+  mkdir -p "$apps/icons"
+
+  # Icons live in the repo; prefer the released tag, fall back to main.
+  fetch_icon() {
+    for ref in "$version" main; do
+      curl -fsSL "https://raw.githubusercontent.com/$REPO/$ref/assets/$1" -o "$2" 2>/dev/null && return 0
+    done
+    return 1
+  }
+  if fetch_icon zabterm-256.png "$icon"; then
+    for size in 48 64 128 256; do
+      dir="$data/icons/hicolor/${size}x${size}/apps"
+      mkdir -p "$dir" && fetch_icon "zabterm-$size.png" "$dir/zabterm.png" || true
+    done
+    mkdir -p "$data/icons/hicolor/scalable/apps"
+    fetch_icon zabterm.svg "$data/icons/hicolor/scalable/apps/zabterm.svg" || true
+  else
+    icon="utilities-system-monitor"
+  fi
+
   cat > "$apps/zabterm.desktop" <<EOF
 [Desktop Entry]
 Type=Application
@@ -55,11 +76,15 @@ GenericName=Monitoring
 Comment=Terminal UI for Zabbix
 Exec=$BIN_DIR/zabterm
 Terminal=true
-Icon=utilities-system-monitor
+Icon=$icon
 Categories=System;Monitor;
 Keywords=zabbix;monitoring;problems;hosts;
 EOF
-  say "Added app launcher entry"
+  if command -v gtk-update-icon-cache >/dev/null && [ -f "$data/icons/hicolor/index.theme" ]; then
+    gtk-update-icon-cache -q "$data/icons/hicolor" >/dev/null 2>&1 || true
+  fi
+  command -v update-desktop-database >/dev/null && update-desktop-database "$apps" >/dev/null 2>&1 || true
+  say "Added app launcher entry and icon"
 fi
 
 config="${XDG_CONFIG_HOME:-$HOME/.config}/zabterm/config.toml"

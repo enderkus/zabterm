@@ -5,6 +5,6 @@ GenericName=Monitoring
 Comment=Terminal UI for Zabbix
 Exec=zabterm
 Terminal=true
-Icon=utilities-system-monitor
+Icon=zabterm
 Categories=System;Monitor;
 Keywords=zabbix;monitoring;problems;hosts;
