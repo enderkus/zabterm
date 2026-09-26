@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=zabterm
+GenericName=Monitoring
+Comment=Terminal UI for Zabbix
+Exec=zabterm
+Terminal=true
+Icon=utilities-system-monitor
+Categories=System;Monitor;
+Keywords=zabbix;monitoring;problems;hosts;
