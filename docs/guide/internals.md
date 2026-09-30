@@ -56,4 +56,4 @@ The token's user needs read access to the host groups you want to see. Acknowled
 
 ## Scale
 
-Each poll is a handful of calls no matter how many hosts you have, but the size of each response grows with the fleet. On large installations, raise `refresh_interval` to 30 or 60 seconds and use a token whose user only sees the host groups you care about.
+Each poll is a handful of calls no matter how many hosts you have, but the size of each response grows with the fleet. On large installations, raise `refresh_interval` to 30 or 60 seconds and use a token whose user only sees the host groups you care about. The network and disk columns come from a key-prefix search that is the slowest call on big instances; it gets a 5 second budget, and if it fails those columns stay empty and it is retried a minute later, so the rest of the dashboard is not held up.

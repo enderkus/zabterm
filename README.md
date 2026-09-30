@@ -161,7 +161,10 @@ A background task owns the API client and polls on `refresh_interval`:
 `host.get`, `problem.get`, `trigger.get` (to map problems to hosts) and two
 `item.get` calls for the handful of keys the overview needs
 (`system.cpu.util`, `vm.memory.util`, `system.cpu.load[all,avg1]`,
-`system.uptime`, `net.if.*`, `vfs.fs.dependent.size[*,pused]`). Sparklines
+`system.uptime`, `net.if.*`, `vfs.fs.dependent.size[*,pused]`). The
+`net.if.*`/`vfs.fs.*` lookup is a key-prefix search that can be slow on very
+large instances, so it gets a 5 second budget; if it fails, the network and
+disk columns stay empty and it is retried a minute later. Sparklines
 are seeded once from `history.get` and then extended from `lastvalue`, so
 steady-state polling does not re-read history. The host page reads
 `history.get` for its chosen range. The UI thread never waits on the
