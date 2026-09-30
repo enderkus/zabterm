@@ -169,3 +169,14 @@ are seeded once from `history.get` and then extended from `lastvalue`, so
 steady-state polling does not re-read history. The host page reads
 `history.get` for its chosen range. The UI thread never waits on the
 network.
+
+## Contributing
+
+Bug reports and pull requests are welcome. Thanks to everyone who has helped:
+
+[![Contributors](https://contrib.rocks/image?repo=enderkus/zabterm)](https://github.com/enderkus/zabterm/graphs/contributors)
+
+## Support
+
+If zabterm saves you some time, you can
+[buy me a coffee](https://buymeacoffee.com/enderk).
