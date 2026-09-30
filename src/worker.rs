@@ -18,6 +18,11 @@ const LOAD: &str = "system.cpu.load[all,avg1]";
 const UPTIME: &str = "system.uptime";
 const NCPU: &str = "system.cpu.num";
 
+/// Time allowed for the optional net/disk item search, and how long to wait
+/// before trying it again after it fails.
+const EXTRA_BUDGET: Duration = Duration::from_secs(5);
+const EXTRA_RETRY: Duration = Duration::from_secs(60);
+
 pub enum Cmd {
     Refresh,
     Host { hostid: String, range: i64 },
@@ -41,6 +46,7 @@ pub fn spawn(profile: Profile, interval: u64, events: UnboundedSender<Event>) ->
 async fn run(profile: Profile, interval: u64, mut rx: UnboundedReceiver<Cmd>, events: UnboundedSender<Event>) {
     let mut client: Option<Client> = None;
     let mut series = SeriesStore::default();
+    let mut extra_retry_at = None;
     let mut ticker = tokio::time::interval(Duration::from_secs(interval));
     ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
 
@@ -65,14 +71,14 @@ async fn run(profile: Profile, interval: u64, mut rx: UnboundedReceiver<Cmd>, ev
         let api = client.as_ref().expect("connected above");
 
         let result = match cmd {
-            Cmd::Refresh => snapshot(api, &mut series).await.map(|s| Event::Snapshot(Box::new(s))),
+            Cmd::Refresh => snapshot(api, &mut series, &mut extra_retry_at).await.map(|s| Event::Snapshot(Box::new(s))),
             Cmd::Host { hostid, range } => host_detail(api, &hostid, range).await.map(|d| Event::Host(Box::new(d))),
             Cmd::Ack { eventids, message, close } => {
                 let n = eventids.len();
                 match api.acknowledge(&eventids, &message, close).await {
                     Ok(()) => {
                         let _ = events.send(Event::Acked(n));
-                        snapshot(api, &mut series).await.map(|s| Event::Snapshot(Box::new(s)))
+                        snapshot(api, &mut series, &mut extra_retry_at).await.map(|s| Event::Snapshot(Box::new(s)))
                     }
                     Err(e) => Err(e),
                 }
@@ -127,22 +133,35 @@ impl SeriesStore {
     }
 }
 
-async fn snapshot(api: &Client, series: &mut SeriesStore) -> Result<Snapshot> {
+async fn snapshot(api: &Client, series: &mut SeriesStore, extra_retry_at: &mut Option<Instant>) -> Result<Snapshot> {
     let started = Instant::now();
-    // The net/disk prefix search has no hostids filter, so on instances with
-    // many thousands of hosts it can run far longer than the other three
-    // calls (or hit a reverse-proxy timeout) and return 5xx/timeout errors
-    // well before it succeeds. Those stats are a bonus for the dashboard, not
-    // required for it to render, so a failure here must not take down hosts,
-    // problems and the core CPU/mem items with it.
-    let (hosts, raw_problems, items, extra) = tokio::join!(
-        api.hosts(),
-        api.problems(),
-        api.items_by_key(None, &[CPU, MEM, LOAD, UPTIME, NCPU]),
-        api.items_by_prefix(None, &["net.if.in[", "net.if.out[", "vfs.fs.dependent.size["]),
-    );
+    // The net/disk prefix search can take far longer than the other calls on
+    // instances with thousands of hosts (or hit a reverse-proxy timeout). Those
+    // stats are a bonus for the dashboard, so the search gets a short budget and
+    // a failure leaves the columns empty instead of failing the snapshot. The
+    // server keeps running a query we gave up on, so after a failure the search
+    // is paused for a while rather than piling up another one on every poll.
+    let try_extra = extra_retry_at.is_none_or(|at| Instant::now() >= at);
+    let extra_search = async {
+        if !try_extra {
+            return None;
+        }
+        let search = api.items_by_prefix(None, &["net.if.in[", "net.if.out[", "vfs.fs.dependent.size["]);
+        Some(tokio::time::timeout(EXTRA_BUDGET, search).await.ok().and_then(Result::ok))
+    };
+    let (hosts, raw_problems, items, extra) = tokio::join!(api.hosts(), api.problems(), api.items_by_key(None, &[CPU, MEM, LOAD, UPTIME, NCPU]), extra_search);
     let (hosts, raw_problems, items) = (hosts?, raw_problems?, items?);
-    let extra = extra.unwrap_or_default();
+    let extra = match extra {
+        Some(Some(found)) => {
+            *extra_retry_at = None;
+            found
+        }
+        Some(None) => {
+            *extra_retry_at = Some(Instant::now() + EXTRA_RETRY);
+            Vec::new()
+        }
+        None => Vec::new(),
+    };
 
     let triggerids: Vec<String> = raw_problems.iter().map(|p| p.objectid.clone()).collect::<HashSet<_>>().into_iter().collect();
     let triggers = api.trigger_hosts(&triggerids).await?;
