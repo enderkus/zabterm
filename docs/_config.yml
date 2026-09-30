@@ -5,7 +5,7 @@ url: https://enderkus.github.io
 baseurl: /zabterm
 repository: enderkus/zabterm
 github_url: https://github.com/enderkus/zabterm
-version: 0.1.1
+version: 0.1.2
 
 permalink: pretty
 markdown: kramdown
