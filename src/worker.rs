@@ -129,12 +129,20 @@ impl SeriesStore {
 
 async fn snapshot(api: &Client, series: &mut SeriesStore) -> Result<Snapshot> {
     let started = Instant::now();
-    let (hosts, raw_problems, items, extra) = tokio::try_join!(
+    // The net/disk prefix search has no hostids filter, so on instances with
+    // many thousands of hosts it can run far longer than the other three
+    // calls (or hit a reverse-proxy timeout) and return 5xx/timeout errors
+    // well before it succeeds. Those stats are a bonus for the dashboard, not
+    // required for it to render, so a failure here must not take down hosts,
+    // problems and the core CPU/mem items with it.
+    let (hosts, raw_problems, items, extra) = tokio::join!(
         api.hosts(),
         api.problems(),
         api.items_by_key(None, &[CPU, MEM, LOAD, UPTIME, NCPU]),
         api.items_by_prefix(None, &["net.if.in[", "net.if.out[", "vfs.fs.dependent.size["]),
-    )?;
+    );
+    let (hosts, raw_problems, items) = (hosts?, raw_problems?, items?);
+    let extra = extra.unwrap_or_default();
 
     let triggerids: Vec<String> = raw_problems.iter().map(|p| p.objectid.clone()).collect::<HashSet<_>>().into_iter().collect();
     let triggers = api.trigger_hosts(&triggerids).await?;
