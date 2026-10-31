@@ -121,11 +121,11 @@ impl Profile {
     }
 
     pub fn resolve_auth(&self) -> Result<Auth> {
-        if let Ok(token) = std::env::var("ZABTERM_TOKEN") {
+        if let Some(token) = std::env::var("ZABTERM_TOKEN").ok().filter(|t| !t.is_empty()) {
             return Ok(Auth::Token(token));
         }
         if let Some(var) = &self.token_env {
-            let token = std::env::var(var).with_context(|| format!("token_env: ${var} is not set"))?;
+            let token = std::env::var(var).ok().filter(|t| !t.is_empty()).ok_or_else(|| anyhow!("token_env: ${var} is not set"))?;
             return Ok(Auth::Token(token));
         }
         if let Some(cmd) = &self.token_cmd {
