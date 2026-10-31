@@ -121,7 +121,7 @@ impl App {
     pub fn new(config: Config, profile: Profile, config_path: PathBuf, cmd: UnboundedSender<Cmd>) -> Self {
         let theme_name = config.theme.clone();
         let notify_min = Severity::from_name(&config.notifications.min_severity).unwrap_or(Severity::Average);
-        let mut app = Self {
+        Self {
             theme: Theme::load(&theme_name),
             theme_sig: theme::omarchy_signature(),
             theme_name,
@@ -156,9 +156,7 @@ impl App {
             notify_min,
             frame: 0,
             quit: false,
-        };
-        app.send(Cmd::Refresh);
-        app
+        }
     }
 
     fn send(&mut self, cmd: Cmd) {
