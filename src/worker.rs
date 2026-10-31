@@ -39,7 +39,7 @@ pub enum Event {
 
 pub fn spawn(profile: Profile, interval: u64, events: UnboundedSender<Event>) -> UnboundedSender<Cmd> {
     let (tx, rx) = unbounded_channel();
-    tokio::spawn(run(profile, interval.max(2), rx, events));
+    tokio::spawn(run(profile, interval, rx, events));
     tx
 }
 
