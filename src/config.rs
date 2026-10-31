@@ -6,7 +6,7 @@
 use anyhow::{Context, Result, anyhow, bail};
 use serde::Deserialize;
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 pub const TEMPLATE: &str = r#"# zabterm: a terminal UI for Zabbix
@@ -199,17 +199,34 @@ impl Config {
     }
 }
 
-pub fn write_template(force: bool) -> Result<PathBuf> {
-    let path = config_path();
+pub fn write_template(path: &Path, force: bool) -> Result<()> {
     if path.exists() && !force {
         bail!("{} already exists (use --force to overwrite)", path.display());
     }
-    std::fs::create_dir_all(config_dir())?;
-    std::fs::write(&path, TEMPLATE)?;
+    if let Some(dir) = path.parent() {
+        std::fs::create_dir_all(dir)?;
+    }
+    std::fs::write(path, TEMPLATE)?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600))?;
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))?;
     }
-    Ok(path)
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn template_goes_where_it_is_told() {
+        let dir = std::env::temp_dir().join(format!("zabterm-init-{}", std::process::id()));
+        let path = dir.join("nested").join("other.toml");
+        write_template(&path, false).unwrap();
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), TEMPLATE);
+        assert!(write_template(&path, false).is_err(), "must not overwrite without --force");
+        write_template(&path, true).unwrap();
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 }
