@@ -169,6 +169,7 @@ impl Config {
         } else {
             Config::default()
         };
+        config.refresh_interval = config.refresh_interval.max(MIN_REFRESH_INTERVAL);
         for (name, profile) in config.profiles.iter_mut() {
             profile.name = name.clone();
         }
@@ -198,6 +199,9 @@ impl Config {
         }
     }
 }
+
+/// Shortest poll interval, in seconds.
+const MIN_REFRESH_INTERVAL: u64 = 2;
 
 pub fn write_template(force: bool) -> Result<PathBuf> {
     let path = config_path();
