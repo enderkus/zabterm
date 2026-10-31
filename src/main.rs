@@ -57,8 +57,8 @@ async fn run(cli: Cli) -> Result<()> {
     let config_path = cli.config.clone().unwrap_or_else(config::config_path);
     match cli.command {
         Some(Command::Init { force }) => {
-            let path = config::write_template(force)?;
-            println!("\x1b[32m✓\x1b[0m wrote {}", path.display());
+            config::write_template(&config_path, force)?;
+            println!("\x1b[32m✓\x1b[0m wrote {}", config_path.display());
             println!("  add your Zabbix URL and API token, then run \x1b[1mzabterm\x1b[0m");
             return Ok(());
         }
